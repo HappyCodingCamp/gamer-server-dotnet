@@ -1,36 +1,39 @@
 using System.Collections.Generic;
 using GamerServer.Models.Api;
 using GamerServer.Models.Db;
+using GamerServer.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GamerServer.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/happinesses")]
     [ApiController]
     public class HappinessesController : ControllerBase
     {
-        private readonly GamerAiContext _dbContext;
+        private readonly IWebApiRepository<HappinessRequest, HappinessResponse> _repository;
 
-        public HappinessesController(GamerAiContext dbContext)
+        public HappinessesController(IWebApiRepository<HappinessRequest, HappinessResponse> repository)
         {
-            _dbContext = dbContext;
+            _repository = repository;
         }
         
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public ActionResult<IEnumerable<HappinessResponse>> Get()
         {
-            return Ok(_dbContext.Happinesses);
+            return Ok(_repository.Get());
         }
 
         [HttpPost]
-        public ActionResult<Happiness> Create([FromBody] HappinessRequest happinessRequest)
+        public ActionResult<HappinessResponse> Create([FromBody] HappinessRequest happinessRequest)
         {
-            Happiness happiness = new Happiness { Level = happinessRequest.Level};
-            
-            _dbContext.Happinesses.Add(happiness);
-            _dbContext.SaveChanges();
+            HappinessResponse response = _repository.Add(happinessRequest);
 
-            return happiness;
+            if (response == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(response);
         }
     }
 }
