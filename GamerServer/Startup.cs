@@ -15,6 +15,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GamerServer
 {
@@ -34,6 +36,14 @@ namespace GamerServer
             
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddEntityFrameworkNpgsql().AddDbContext<GamerAiContext>(options => options.UseNpgsql(connectionString));
+            
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Gamer AI API", Version = "v1" });
+            });
+            
+            // Register repositories
             services.AddScoped<IWebApiRepository<HappinessRequest, HappinessResponse>, HappinessesRepository>();
         }
 
@@ -43,6 +53,12 @@ namespace GamerServer
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Gamer AI API V1");
+                });
             }
             else
             {
@@ -53,4 +69,5 @@ namespace GamerServer
             app.UseMvc();
         }
     }
+   
 }

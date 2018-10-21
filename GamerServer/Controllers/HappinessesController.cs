@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GamerServer.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/happinesses")]
     [ApiController]
     public class HappinessesController : ControllerBase
     {
